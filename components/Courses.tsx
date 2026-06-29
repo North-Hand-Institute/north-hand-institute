@@ -82,17 +82,17 @@ export default function Courses({ courses, events }: { courses: Course[]; events
                         <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.6rem', color: 'var(--navy)', lineHeight: 1 }}>{formatPrice(event.price)}</div>
                         <div style={{ fontSize: '0.6rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--light-text)' }}>per person</div>
                       </div>
-                      <a href="#contact" style={{
-                        padding: '0.75rem 1.8rem', background: 'var(--persimmon)', color: 'white',
-                        textDecoration: 'none', fontSize: '0.68rem', letterSpacing: '0.18em',
-                        textTransform: 'uppercase', fontWeight: 500, whiteSpace: 'nowrap',
-                        transition: 'background 0.3s',
-                      }}
-                        onMouseEnter={e => (e.currentTarget.style.background = '#b84a20')}
-                        onMouseLeave={e => (e.currentTarget.style.background = 'var(--persimmon)')}
-                      >
-                        Inquire to Enroll
-                      </a>
+                      <a href={event.booking_url || '#contact'} target="_blank" rel="noopener noreferrer" style={{
+  padding: '0.75rem 1.8rem', background: 'var(--persimmon)', color: 'white',
+  textDecoration: 'none', fontSize: '0.68rem', letterSpacing: '0.18em',
+  textTransform: 'uppercase', fontWeight: 500, whiteSpace: 'nowrap',
+  transition: 'background 0.3s',
+}}
+  onMouseEnter={e => (e.currentTarget.style.background = '#b84a20')}
+  onMouseLeave={e => (e.currentTarget.style.background = 'var(--persimmon)')}
+>
+  Enroll
+</a>
                     </div>
                   </div>
                 ))
