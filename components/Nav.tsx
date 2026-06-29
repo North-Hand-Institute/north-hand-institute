@@ -21,9 +21,9 @@ export default function Nav() {
       transition: 'background 0.3s',
     }}>
       <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', fontWeight: 600, color: 'var(--cream)', letterSpacing: '0.08em', textTransform: 'uppercase', lineHeight: 1.2 }}>
-        North Hand Institute
+        North Hand
         <span style={{ display: 'block', fontWeight: 300, fontSize: '0.7rem', letterSpacing: '0.2em', color: 'var(--gold)', fontFamily: 'Jost, sans-serif' }}>
-          for Massage Education
+          Institute of Massage Education
         </span>
       </div>
       <ul style={{ display: 'flex', gap: '2.5rem', listStyle: 'none' }}>
