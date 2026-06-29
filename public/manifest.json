@@ -1,0 +1,13 @@
+{
+  "name": "North Hand Institute for Massage Education",
+  "short_name": "North Hand",
+  "description": "NCBTMB Approved continuing education for Licensed Massage Therapists",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a2640",
+  "theme_color": "#1a2640",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
