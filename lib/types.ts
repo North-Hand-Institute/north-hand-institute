@@ -21,6 +21,7 @@ export interface Event {
   spots_total: number
   spots_remaining: number
   notes: string
+  booking_url: string
   active: boolean
   created_at: string
 }
