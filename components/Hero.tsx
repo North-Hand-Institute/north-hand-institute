@@ -71,7 +71,7 @@ export default function Hero({ tagline }: { tagline?: string }) {
 
         {/* Right */}
         <div className="hero-right" style={{ position: 'relative', overflow: 'hidden', background: '#e8d8b8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <img src="/North_Hand_Logo.png" alt="North Hand Institute" className="hero-right-img" />
+          <img src="/North Hand Logo.png" alt="North Hand Institute" className="hero-right-img" />
           <img src="/ncbtmb-badge.jpg" alt="NCBTMB Approved Provider" className="hero-badge" style={{ position: 'absolute', bottom: '2.5rem', right: '2.5rem', width: 100, filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.15))' }} />
         </div>
       </section>
