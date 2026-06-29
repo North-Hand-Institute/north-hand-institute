@@ -37,7 +37,7 @@ export default function Nav() {
           <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', fontWeight: 600, color: '#f5edd8', letterSpacing: '0.06em', textTransform: 'uppercase', lineHeight: 1.2 }}>
             North Hand
             <span style={{ display: 'block', fontWeight: 300, fontSize: '0.62rem', letterSpacing: '0.15em', color: '#b8956a', fontFamily: 'Jost, sans-serif' }}>
-              Institute for Massage Education
+              Institute of Massage Education
             </span>
           </div>
         </a>
