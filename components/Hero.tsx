@@ -31,7 +31,7 @@ export default function Hero({ tagline }: { tagline?: string }) {
 
         {/* Right */}
         <div style={{ position: 'relative', overflow: 'hidden', background: 'var(--parchment)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <img src="/vitruvian.png" alt="Vitruvian anatomical study" style={{ width: '85%', maxWidth: 480, opacity: 0.82, mixBlendMode: 'multiply', filter: 'sepia(15%) contrast(1.05)' }} />
+          <img src="/North Hand Logo.png" alt="Vitruvian anatomical study" style={{ width: '85%', maxWidth: 480, opacity: 0.82, mixBlendMode: 'multiply', filter: 'sepia(15%) contrast(1.05)' }} />
           <img src="/ncbtmb-badge.jpg" alt="NCBTMB Approved Provider" style={{ position: 'absolute', bottom: '2.5rem', right: '2.5rem', width: 100, filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.15))' }} />
         </div>
       </section>
