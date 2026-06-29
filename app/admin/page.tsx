@@ -209,6 +209,8 @@ export default function AdminPage() {
                     <input type="number" value={editEvent.spots_remaining || ''} onChange={e => setEditEvent({ ...editEvent, spots_remaining: parseInt(e.target.value) })} style={s.input} placeholder="12" />
                   </div>
                 </div>
+                <label style={s.label}>Booking URL</label>
+                <input value={editEvent.booking_url || ''} onChange={e => setEditEvent({ ...editEvent, booking_url: e.target.value })} style={s.input} placeholder="https://www.vagaro.com/..." />
                 <label style={s.label}>Notes (optional)</label>
                 <input value={editEvent.notes || ''} onChange={e => setEditEvent({ ...editEvent, notes: e.target.value })} style={s.input} placeholder="Hosted graciously by Sol Spa" />
                 <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
