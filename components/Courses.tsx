@@ -110,7 +110,7 @@ export default function Courses({ courses, events }: { courses: Course[]; events
                           onMouseEnter={e => (e.currentTarget.style.background = '#b84a20')}
                           onMouseLeave={e => (e.currentTarget.style.background = '#c9572a')}
                         >
-                          Book Now
+                          Enroll
                         </a>
                       </div>
                     </div>
