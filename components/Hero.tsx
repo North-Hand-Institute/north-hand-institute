@@ -20,13 +20,14 @@ export default function Hero({ tagline }: { tagline?: string }) {
             min-height: auto !important;
           }
           .hero-left {
-            padding: 6rem 1.5rem 3rem !important;
-            order: 2;
-          }
-          .hero-right {
-            order: 1;
-            min-height: 60vw !important;
-          }
+  padding: 2rem 1.5rem 3rem !important;
+  order: 2;
+}
+         .hero-right {
+  order: 1;
+  min-height: 60vw !important;
+  padding-top: 56px !important;
+}
           .hero-right-img {
             width: 90% !important;
           }
