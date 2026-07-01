@@ -46,7 +46,7 @@ export function Contact() {
     if (!name || !email || !message) { alert('Please fill in all fields.'); return }
     const subject = encodeURIComponent('Course Inquiry from ' + name)
     const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`)
-    window.location.href = `mailto:michaelcorcoranlmt@gmail.com?subject=${subject}&body=${body}`
+    window.location.href = `mailto:info@northhandinstitute.org?subject=${subject}&body=${body}`
   }
 
   const inputStyle: React.CSSProperties = {
@@ -63,7 +63,7 @@ export function Contact() {
             Questions? <em style={{ fontStyle: 'italic', color: '#5c3d1e' }}>Let's Talk.</em>
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', marginTop: '2.5rem' }}>
-            {[['Email', 'michaelcorcoranlmt@gmail.com', 'mailto:michaelcorcoranlmt@gmail.com'], ['Phone', '(518) 330-7272', 'tel:5183307272'], ['Instructor', 'Michael Corcoran, LMT', '']].map(([label, val, href]) => (
+            {[['Email', info@northhandinstitute.org', 'mailto:info@northhandinstitute.org'], ['Phone', '(518) 330-7272', 'tel:5183307272'], ['Instructor', 'Michael Corcoran, LMT', '']].map(([label, val, href]) => (
               <div key={label}>
                 <div style={{ fontSize: '0.62rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#c9572a', fontWeight: 500, marginBottom: '0.3rem' }}>{label}</div>
                 {href ? <a href={href} style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', color: '#1a2640', textDecoration: 'none' }}>{val}</a>
@@ -100,13 +100,13 @@ export function Footer() {
     <footer style={{ background: '#1a2640', padding: '2.5rem 3rem', borderTop: '1px solid rgba(184,149,106,0.2)' }}>
       <div className="footer-inner" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', fontWeight: 600, color: '#f5edd8', letterSpacing: '0.06em' }}>
-          North Hand Institute for Massage Education
+          North Hand Institute of Massage Education
         </div>
         <div style={{ fontSize: '0.7rem', color: 'rgba(245,237,216,0.4)', letterSpacing: '0.08em' }}>
           © {new Date().getFullYear()} Michael Corcoran, LMT · AP #1003193
         </div>
-        <a href="mailto:michaelcorcoranlmt@gmail.com" style={{ fontSize: '0.75rem', color: '#b8956a', textDecoration: 'none' }}>
-          michaelcorcoranlmt@gmail.com
+        <a href="mailto:info@northhandinstitute.org" style={{ fontSize: '0.75rem', color: '#b8956a', textDecoration: 'none' }}>
+         info@northhandinstitute.org
         </a>
       </div>
     </footer>
