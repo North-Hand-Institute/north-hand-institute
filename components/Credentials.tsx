@@ -63,7 +63,7 @@ export function Contact() {
             Questions? <em style={{ fontStyle: 'italic', color: '#5c3d1e' }}>Let's Talk.</em>
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', marginTop: '2.5rem' }}>
-            {[['Email', info@northhandinstitute.org', 'mailto:info@northhandinstitute.org'], ['Phone', '(518) 330-7272', 'tel:5183307272'], ['Instructor', 'Michael Corcoran, LMT', '']].map(([label, val, href]) => (
+            {[['Email', 'info@northhandinstitute.org', 'mailto:info@northhandinstitute.org'], ['Phone', '(518) 330-7272', 'tel:5183307272'], ['Instructor', 'Michael Corcoran, LMT', '']].map(([label, val, href]) => (
               <div key={label}>
                 <div style={{ fontSize: '0.62rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#c9572a', fontWeight: 500, marginBottom: '0.3rem' }}>{label}</div>
                 {href ? <a href={href} style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', color: '#1a2640', textDecoration: 'none' }}>{val}</a>
