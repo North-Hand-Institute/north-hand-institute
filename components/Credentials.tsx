@@ -108,6 +108,9 @@ export function Footer() {
         <a href="mailto:info@northhandinstitute.org" style={{ fontSize: '0.75rem', color: '#b8956a', textDecoration: 'none' }}>
          info@northhandinstitute.org
         </a>
+        <a href="https://michaelcorcoranlmt.com" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.75rem', color: '#b8956a', textDecoration: 'none' }}>
+  Visit My Massage Practice ↗
+</a>
       </div>
     </footer>
   )
