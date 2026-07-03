@@ -6,7 +6,8 @@ export function Credentials() {
       <style>{`
         .credentials-section { padding: 6rem 5rem; }
         .credentials-inner { display: flex; justify-content: center; align-items: center; gap: 4rem; flex-wrap: wrap; }
-        .credential-text { max-width: 380px; text-align: left; }
+        .credential-text { max-width: 480px; text-align: left; }
+        .credential-block + .credential-block { margin-top: 2.5rem; }
         .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
         .contact-form-col { padding-top: 3.5rem; }
         @media (max-width: 768px) {
@@ -27,10 +28,18 @@ export function Credentials() {
         <div className="credentials-inner">
           <img src="/ncbtmb-badge.jpg" alt="NCBTMB Approved Provider" style={{ width: 130, filter: 'drop-shadow(0 6px 20px rgba(0,0,0,0.3))' }} />
           <div className="credential-text">
-            <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.5rem', fontWeight: 400, color: '#f5edd8', marginBottom: '0.8rem' }}>NCBTMB Approved Provider</h3>
-            <p style={{ fontSize: '0.88rem', lineHeight: 1.8, color: 'rgba(245,237,216,0.65)' }}>
-              North Hand Institute is a proud Approved Provider of the National Certification Board for Therapeutic Massage & Bodywork (AP #1003193). All courses qualify for NCBTMB continuing education hours, supporting your professional licensure requirements.
-            </p>
+            <div className="credential-block">
+              <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.5rem', fontWeight: 400, color: '#f5edd8', marginBottom: '0.8rem' }}>New York State Sponsor</h3>
+              <p style={{ fontSize: '0.88rem', lineHeight: 1.8, color: 'rgba(245,237,216,0.65)' }}>
+                Michael Corcoran is approved as a sponsor of continuing education for Massage Therapists by the New York State Education Department, Office of Professions. Unless otherwise noted, all of the current Continuing Education classes satisfy CE Hours for New York State Licensed LMT&rsquo;s.
+              </p>
+            </div>
+            <div className="credential-block">
+              <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.5rem', fontWeight: 400, color: '#f5edd8', marginBottom: '0.8rem' }}>NCBTMB Approved Provider</h3>
+              <p style={{ fontSize: '0.88rem', lineHeight: 1.8, color: 'rgba(245,237,216,0.65)' }}>
+                In addition, Michael Corcoran is approved by the National Certification Board for Therapeutic Massage & Bodywork (NCBTMB) as a continuing education approved provider. Unless otherwise noted, all of the current Continuing Education classes satisfy CE Hours for LMT&rsquo;s with National Licensure. (AP #1003193)
+              </p>
+            </div>
           </div>
         </div>
       </section>
