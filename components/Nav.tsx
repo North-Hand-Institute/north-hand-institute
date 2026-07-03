@@ -42,27 +42,30 @@ export default function Nav() {
           </div>
         </a>
 
-        {/* Desktop links */}
-        <ul className="nav-links-desktop" style={{ display: 'flex', gap: '2rem', listStyle: 'none' }}>
-          {links.map(item => (
-            <li key={item}>
-              <a href={`#${item.toLowerCase()}`} style={{
-                textDecoration: 'none', color: 'rgba(245,237,216,0.75)',
-                fontSize: '0.72rem', letterSpacing: '0.18em', textTransform: 'uppercase',
-              }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#c9572a')}
-                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(245,237,216,0.75)')}
-              >{item}</a>
-            </li>
-          ))}
-        </ul>
-        <a href="https://michaelcorcoranlmt.com" target="_blank" rel="noopener noreferrer" style={{
-          textDecoration: 'none', color: '#b8956a',
-          fontSize: '0.72rem', letterSpacing: '0.18em', textTransform: 'uppercase',
-          border: '1px solid rgba(184,149,106,0.4)', padding: '0.5rem 1rem',
-        }}>
-          Massage Practice ↗
-        </a>
+        {/* Desktop links + cross-link, grouped together */}
+        <div className="nav-links-desktop" style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+          <ul style={{ display: 'flex', gap: '2rem', listStyle: 'none' }}>
+            {links.map(item => (
+              <li key={item}>
+                <a href={`#${item.toLowerCase()}`} style={{
+                  textDecoration: 'none', color: 'rgba(245,237,216,0.75)',
+                  fontSize: '0.72rem', letterSpacing: '0.18em', textTransform: 'uppercase',
+                }}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#c9572a')}
+                  onMouseLeave={e => (e.currentTarget.style.color = 'rgba(245,237,216,0.75)')}
+                >{item}</a>
+              </li>
+            ))}
+          </ul>
+          <a href="https://michaelcorcoranlmt.com" target="_blank" rel="noopener noreferrer" style={{
+            textDecoration: 'none', color: '#b8956a',
+            fontSize: '0.72rem', letterSpacing: '0.18em', textTransform: 'uppercase',
+            border: '1px solid rgba(184,149,106,0.4)', padding: '0.5rem 1rem',
+            whiteSpace: 'nowrap',
+          }}>
+            Massage Practice ↗
+          </a>
+        </div>
 
         {/* Hamburger */}
         <button className="nav-hamburger" onClick={() => setMenuOpen(!menuOpen)} style={{
@@ -97,10 +100,17 @@ export default function Nav() {
               borderBottom: '1px solid rgba(184,149,106,0.1)',
             }}
           >{item}</a>
-      <a href="https://michaelcorcoranlmt.com" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.75rem', color: '#b8956a', textDecoration: 'none' }}>
-  Visit My Massage Practice ↗
-</a>
         ))}
+        <a href="https://michaelcorcoranlmt.com" target="_blank" rel="noopener noreferrer"
+          onClick={() => setMenuOpen(false)}
+          style={{
+            padding: '0.9rem 2rem', textDecoration: 'none',
+            color: '#b8956a', fontSize: '0.8rem',
+            letterSpacing: '0.2em', textTransform: 'uppercase',
+          }}
+        >
+          Massage Practice ↗
+        </a>
       </div>
     </>
   )
