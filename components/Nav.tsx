@@ -56,6 +56,13 @@ export default function Nav() {
             </li>
           ))}
         </ul>
+        <a href="https://michaelcorcoranlmt.com" target="_blank" rel="noopener noreferrer" style={{
+          textDecoration: 'none', color: '#b8956a',
+          fontSize: '0.72rem', letterSpacing: '0.18em', textTransform: 'uppercase',
+          border: '1px solid rgba(184,149,106,0.4)', padding: '0.5rem 1rem',
+        }}>
+          Massage Practice ↗
+        </a>
 
         {/* Hamburger */}
         <button className="nav-hamburger" onClick={() => setMenuOpen(!menuOpen)} style={{
