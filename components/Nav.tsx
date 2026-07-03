@@ -97,6 +97,9 @@ export default function Nav() {
               borderBottom: '1px solid rgba(184,149,106,0.1)',
             }}
           >{item}</a>
+      <a href="https://michaelcorcoranlmt.com" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.75rem', color: '#b8956a', textDecoration: 'none' }}>
+  Visit My Massage Practice ↗
+</a>
         ))}
       </div>
     </>
