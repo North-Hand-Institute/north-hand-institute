@@ -81,3 +81,9 @@ export function slidePath(moduleN: number, slideN: number): string {
 // (Testing-phase progress tracking only — not a substitute for real
 // enrollment, which comes with the Option B account system later.)
 export const PROGRESS_STORAGE_KEY = `nhi-progress-${COURSE.slug}`
+
+export const PROVIDER = {
+     name: 'North Hand Institute of Massage Education',
+     instructor: 'Michael Corcoran, LMT',
+     apNumber: 'NCBTMB Approved Provider AP #1003193',
+   }
