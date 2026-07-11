@@ -29,9 +29,5 @@ export default async function ModulePage({ params }: Params) {
     notFound()
   }
 
-  return (
-    <main style={{ backgroundColor: 'var(--cream)', minHeight: '100vh', paddingBottom: '3rem' }}>
-      <SlideViewer module={mod} />
-    </main>
-  )
+  return <SlideViewer module={mod} />
 }
