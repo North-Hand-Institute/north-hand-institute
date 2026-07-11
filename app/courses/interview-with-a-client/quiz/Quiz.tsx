@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { COURSE } from '@/lib/course-config'
+import { COURSE, PROVIDER } from '@/lib/course-config'
 import {
   QUIZ_QUESTIONS,
   PASS_THRESHOLD_PERCENT,
@@ -26,6 +26,8 @@ export default function Quiz() {
   const [result, setResult] = useState<Result | null>(null)
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const [formError, setFormError] = useState('')
+  const [completedAt, setCompletedAt] = useState('')
+  const [certificateId, setCertificateId] = useState('')
 
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
   const nameValid = name.trim().length >= 2
@@ -68,6 +70,14 @@ export default function Quiz() {
     const passed = percent >= PASS_THRESHOLD_PERCENT
     const res = { score, percent, passed }
     setResult(res)
+    if (passed) {
+      setCompletedAt(
+        new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+      )
+      setCertificateId(
+        `${Date.now().toString(36).toUpperCase()}-${(name.trim().slice(0, 1) + email.trim().slice(0, 1)).toUpperCase()}`
+      )
+    }
     setStage('result')
     window.scrollTo({ top: 0, behavior: 'smooth' })
 
@@ -304,7 +314,7 @@ export default function Quiz() {
         ) : (
           <p style={{ fontSize: '0.98rem', lineHeight: 1.6, color: 'var(--navy)', maxWidth: '440px', margin: '0 auto' }}>
             A score of {PASS_THRESHOLD_PERCENT}% is required to pass. Review the modules and try again
-   whenever you&rsquo;re ready &mdash; there&rsquo;s no penalty for retaking.
+            whenever you&rsquo;re ready &mdash; there&rsquo;s no penalty for retaking.
           </p>
         )}
 
@@ -316,6 +326,151 @@ export default function Quiz() {
             'Your score is shown above, but we couldn\u2019t record it automatically. Please contact North Hand Institute to confirm your completion.'}
         </p>
       </div>
+
+      {passed && (
+        <>
+          <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+            <button onClick={() => window.print()} style={primaryBtn}>
+              Download Certificate (PDF) &darr;
+            </button>
+            <p style={{ fontSize: '0.78rem', color: 'var(--light-text)', marginTop: '0.5rem' }}>
+              This opens your browser&rsquo;s print dialog &mdash; choose &ldquo;Save as PDF&rdquo; as the
+              destination.
+            </p>
+          </div>
+
+          {/* Printable certificate — hidden on screen, shown only when printing */}
+          <div className="nhi-certificate">
+            <div className="nhi-cert-border">
+              <p className="nhi-cert-eyebrow">{PROVIDER.name}</p>
+              <p className="nhi-cert-title">Certificate of Completion</p>
+              <p className="nhi-cert-line">This certifies that</p>
+              <p className="nhi-cert-name">{name.trim()}</p>
+              <p className="nhi-cert-line">has successfully completed the continuing education course</p>
+              <p className="nhi-cert-course">{COURSE.title}</p>
+              <p className="nhi-cert-line">{COURSE.subtitle}</p>
+              <p className="nhi-cert-hours">{COURSE.ceHours}.0 NCBTMB-Approved Continuing Education Hours</p>
+
+              <div className="nhi-cert-footer">
+                <div>
+                  <p className="nhi-cert-label">Date Completed</p>
+                  <p className="nhi-cert-value">{completedAt}</p>
+                </div>
+                <div>
+                  <p className="nhi-cert-label">Certificate No.</p>
+                  <p className="nhi-cert-value">{certificateId}</p>
+                </div>
+                <div>
+                  <p className="nhi-cert-label">Provider</p>
+                  <p className="nhi-cert-value">{PROVIDER.apNumber}</p>
+                </div>
+              </div>
+
+              <div className="nhi-cert-sig">
+                <p className="nhi-cert-sig-name">{PROVIDER.instructor}</p>
+                <p className="nhi-cert-sig-role">{PROVIDER.name}</p>
+              </div>
+            </div>
+          </div>
+
+          <style>{`
+            .nhi-certificate { display: none; }
+            @media print {
+              body * { visibility: hidden !important; }
+              .nhi-certificate, .nhi-certificate * { visibility: visible !important; }
+              .nhi-certificate {
+                display: block !important;
+                position: fixed;
+                inset: 0;
+                margin: 0;
+              }
+              @page { size: landscape; margin: 0.4in; }
+            }
+            .nhi-cert-border {
+              border: 3px solid var(--navy);
+              outline: 1px solid var(--persimmon);
+              outline-offset: -10px;
+              padding: 1.6in 0.6in 0.4in;
+              text-align: center;
+              font-family: 'Jost', sans-serif;
+              color: var(--navy);
+              height: 100%;
+              box-sizing: border-box;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              gap: 0.12in;
+            }
+            .nhi-cert-eyebrow {
+              text-transform: uppercase;
+              letter-spacing: 0.12em;
+              font-size: 11pt;
+              color: var(--persimmon);
+              margin: 0;
+            }
+            .nhi-cert-title {
+              font-family: 'Cormorant Garamond', serif;
+              font-size: 32pt;
+              font-weight: 600;
+              margin: 0.08in 0;
+            }
+            .nhi-cert-line { font-size: 12pt; margin: 0; color: var(--brown); }
+            .nhi-cert-name {
+              font-family: 'Cormorant Garamond', serif;
+              font-size: 26pt;
+              font-style: italic;
+              margin: 0.12in 0;
+            }
+            .nhi-cert-course {
+              font-family: 'Cormorant Garamond', serif;
+              font-size: 18pt;
+              font-weight: 600;
+              margin: 0.08in 0;
+            }
+            .nhi-cert-hours {
+              font-size: 13pt;
+              font-weight: 500;
+              color: var(--persimmon);
+              margin: 0.16in 0;
+            }
+            .nhi-cert-footer {
+              display: flex;
+              justify-content: center;
+              gap: 0.7in;
+              margin-top: 0.24in;
+            }
+            .nhi-cert-label {
+              font-size: 9pt;
+              text-transform: uppercase;
+              letter-spacing: 0.08em;
+              color: var(--light-text);
+              margin: 0;
+            }
+            .nhi-cert-value {
+              font-size: 11pt;
+              font-weight: 500;
+              margin: 0.04in 0 0;
+            }
+            .nhi-cert-sig {
+              margin-top: 0.24in;
+              border-top: 1px solid rgba(26,38,64,0.3);
+              padding-top: 0.1in;
+              display: inline-block;
+            }
+            .nhi-cert-sig-name {
+              font-family: 'Cormorant Garamond', serif;
+              font-style: italic;
+              font-size: 14pt;
+              margin: 0;
+            }
+            .nhi-cert-sig-role {
+              font-size: 9pt;
+              color: var(--light-text);
+              margin: 0.03in 0 0;
+            }
+          `}</style>
+        </>
+      )}
 
       <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap', marginTop: '1.5rem' }}>
         <Link href={`/courses/${COURSE.slug}`} style={secondaryBtn}>
