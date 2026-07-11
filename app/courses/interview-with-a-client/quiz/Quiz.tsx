@@ -304,7 +304,7 @@ export default function Quiz() {
         ) : (
           <p style={{ fontSize: '0.98rem', lineHeight: 1.6, color: 'var(--navy)', maxWidth: '440px', margin: '0 auto' }}>
             A score of {PASS_THRESHOLD_PERCENT}% is required to pass. Review the modules and try again
-            whenever you\u2019re ready \u2014 there\u2019s no penalty for retaking.
+   whenever you&rsquo;re ready &mdash; there&rsquo;s no penalty for retaking.
           </p>
         )}
 
