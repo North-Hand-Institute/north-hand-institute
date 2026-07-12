@@ -19,8 +19,10 @@ export default function SlideViewer({ module }: Props) {
   const { n: moduleN, title, slideCount } = module
   const [current, setCurrent] = useState(1) // 1-indexed slide number
   const [completed, setCompleted] = useState(false)
+  const [fsSupported, setFsSupported] = useState(false)
   const touchStartX = useRef<number | null>(null)
   const touchStartY = useRef<number | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const atStart = current <= 1
   const atEnd = current >= slideCount
@@ -34,14 +36,16 @@ export default function SlideViewer({ module }: Props) {
     setCurrent((c) => Math.max(c - 1, 1))
   }, [])
 
+  // ── Detect real Fullscreen API support (not available on iOS Safari) ──
+  useEffect(() => {
+    setFsSupported(typeof document !== 'undefined' && !!document.fullscreenEnabled)
+  }, [])
+
   // ── Keyboard navigation ──
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') {
-        goNext()
-      } else if (e.key === 'ArrowLeft') {
-        goPrev()
-      }
+      if (e.key === 'ArrowRight') goNext()
+      else if (e.key === 'ArrowLeft') goPrev()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -74,7 +78,6 @@ export default function SlideViewer({ module }: Props) {
     if (touchStartX.current === null || touchStartY.current === null) return
     const dx = e.changedTouches[0].clientX - touchStartX.current
     const dy = e.changedTouches[0].clientY - touchStartY.current
-    // Only treat as a horizontal swipe if it's clearly horizontal and long enough
     if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
       if (dx < 0) goNext()
       else goPrev()
@@ -83,255 +86,284 @@ export default function SlideViewer({ module }: Props) {
     touchStartY.current = null
   }
 
+  // ── Optional true-fullscreen toggle (desktop / Android; no-op on iOS Safari) ──
+  const toggleFullscreen = () => {
+    const el = containerRef.current
+    if (!el) return
+    if (!document.fullscreenElement) {
+      el.requestFullscreen?.().catch(() => {})
+    } else {
+      document.exitFullscreen?.().catch(() => {})
+    }
+  }
+
   const nextModule = MODULES.find((m) => m.n === moduleN + 1)
   const isLastModule = moduleN === TOTAL_MODULES
 
+  // ─────────────────────────────────────────────────────────────
+  // ACTIVE SLIDE VIEW
+  // Fixed to the viewport, header/footer pinned, image fills the
+  // remaining space. Nothing here ever requires scrolling, on any
+  // device or orientation.
+  // ─────────────────────────────────────────────────────────────
+  if (!completed) {
+    return (
+      <div ref={containerRef} className="nhi-viewer-root">
+        <style>{`
+          .nhi-viewer-root {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background-color: var(--navy);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: 100dvh;
+          }
+          .nhi-viewer-header {
+            flex: 0 0 auto;
+            padding: 0.6rem 0.9rem 0.4rem;
+          }
+          .nhi-viewer-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+          }
+          .nhi-viewer-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 0.5rem;
+            margin-top: 0.15rem;
+          }
+          .nhi-viewer-title {
+            font-family: 'Jost', sans-serif;
+            font-size: 0.85rem;
+            color: var(--parchment);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          .nhi-viewer-exit {
+            font-family: 'Jost', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.04em;
+            color: var(--cream);
+            text-decoration: none;
+            white-space: nowrap;
+          }
+          .nhi-viewer-badge {
+            font-family: 'Jost', sans-serif;
+            font-size: 0.78rem;
+            color: var(--parchment);
+            white-space: nowrap;
+          }
+          .nhi-viewer-fs-btn {
+            background: none;
+            border: 1px solid rgba(245,237,216,0.4);
+            color: var(--cream);
+            border-radius: 6px;
+            font-size: 0.72rem;
+            padding: 0.25rem 0.55rem;
+            cursor: pointer;
+            font-family: 'Jost', sans-serif;
+          }
+          .nhi-viewer-progress {
+            flex: 0 0 auto;
+            height: 3px;
+            background-color: rgba(245,237,216,0.15);
+          }
+          .nhi-viewer-progress-fill {
+            height: 100%;
+            background-color: var(--persimmon);
+            transition: width 0.2s ease;
+          }
+          .nhi-viewer-stage {
+            flex: 1 1 auto;
+            min-height: 0;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--navy);
+          }
+          .nhi-viewer-stage img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            display: block;
+            user-select: none;
+          }
+          .nhi-viewer-tapzone {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 18%;
+            border: none;
+            background: transparent;
+          }
+          .nhi-viewer-footer {
+            flex: 0 0 auto;
+            display: flex;
+            border-top: 1px solid rgba(245,237,216,0.15);
+          }
+          .nhi-viewer-nav-btn {
+            flex: 1 1 50%;
+            border: none;
+            background-color: rgba(245,237,216,0.06);
+            color: var(--cream);
+            font-family: 'Jost', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 0.9rem 0.5rem;
+            cursor: pointer;
+          }
+          .nhi-viewer-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: default;
+          }
+          .nhi-viewer-nav-btn + .nhi-viewer-nav-btn {
+            border-left: 1px solid rgba(245,237,216,0.15);
+          }
+          .nhi-viewer-hint {
+            text-align: center;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.68rem;
+            color: rgba(245,237,216,0.55);
+            padding: 0.3rem 0 0.5rem;
+          }
+        `}</style>
+
+        <div className="nhi-viewer-header">
+          <div className="nhi-viewer-header-row">
+            <Link href={`/courses/${COURSE.slug}`} className="nhi-viewer-exit">
+              &larr; Exit to Modules
+            </Link>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <span className="nhi-viewer-badge">
+                Module {moduleN} of {TOTAL_MODULES}
+              </span>
+              {fsSupported && (
+                <button
+                  onClick={toggleFullscreen}
+                  className="nhi-viewer-fs-btn"
+                  aria-label="Toggle fullscreen"
+                >
+                  Fullscreen
+                </button>
+              )}
+            </div>
+          </div>
+          <div className="nhi-viewer-title-row">
+            <span className="nhi-viewer-title">{title}</span>
+            <span className="nhi-viewer-badge">
+              Slide {current} / {slideCount}
+            </span>
+          </div>
+        </div>
+
+        <div className="nhi-viewer-progress">
+          <div
+            className="nhi-viewer-progress-fill"
+            style={{ width: `${(current / slideCount) * 100}%` }}
+          />
+        </div>
+
+        <div className="nhi-viewer-stage" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={slidePath(moduleN, current)}
+            alt={`Module ${moduleN}, slide ${current} of ${slideCount}`}
+            draggable={false}
+          />
+          <button
+            aria-label="Previous slide"
+            onClick={goPrev}
+            disabled={atStart}
+            className="nhi-viewer-tapzone"
+            style={{ left: 0 }}
+          />
+          <button
+            aria-label="Next slide"
+            onClick={goNext}
+            disabled={atEnd}
+            className="nhi-viewer-tapzone"
+            style={{ right: 0 }}
+          />
+        </div>
+
+        <div className="nhi-viewer-footer">
+          <button onClick={goPrev} disabled={atStart} className="nhi-viewer-nav-btn">
+            &larr; Previous
+          </button>
+          <button onClick={goNext} disabled={atEnd} className="nhi-viewer-nav-btn">
+            Next &rarr;
+          </button>
+        </div>
+        <p className="nhi-viewer-hint">Use arrow keys, swipe, or tap the buttons above to navigate.</p>
+      </div>
+    )
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // MODULE COMPLETE SCREEN
+  // A normal, calmly scrollable page — this one isn't a navigation
+  // pain point, so it doesn't need the fixed-viewport treatment.
+  // ─────────────────────────────────────────────────────────────
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '1.5rem' }}>
-      {/* Breadcrumb / module label */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'baseline',
-          flexWrap: 'wrap',
-          gap: '0.5rem',
-          marginBottom: '1rem',
-        }}
-      >
-        <Link
-          href={`/courses/${COURSE.slug}`}
-          style={{
-            fontFamily: "'Jost', sans-serif",
-            fontSize: '0.8rem',
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-            color: 'var(--navy)',
-            textDecoration: 'none',
-          }}
+    <div style={{ backgroundColor: 'var(--cream)', minHeight: '100vh', padding: '2.5rem 1.5rem' }}>
+      <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center' }}>
+        <p
+          className="font-display"
+          style={{ fontSize: '1.7rem', fontWeight: 600, color: 'var(--navy)', margin: '0 0 0.5rem' }}
         >
-          &larr; All Modules
-        </Link>
-        <span
-          style={{
-            fontFamily: "'Jost', sans-serif",
-            fontSize: '0.8rem',
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-            color: 'var(--light-text)',
-          }}
-        >
-          Module {moduleN} of {TOTAL_MODULES}
-        </span>
-      </div>
-
-      {/* Module title */}
-      <h1
-        className="font-display"
-        style={{
-          fontSize: 'clamp(1.5rem, 3vw, 2.1rem)',
-          fontWeight: 600,
-          color: 'var(--navy)',
-          lineHeight: 1.15,
-          margin: '0 0 1rem',
-        }}
-      >
-        {title}
-      </h1>
-
-      {/* Slide stage */}
-      <div
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
-        style={{
-          position: 'relative',
-          width: '100%',
-          aspectRatio: '16 / 9',
-          backgroundColor: 'var(--navy)',
-          borderRadius: '10px',
-          overflow: 'hidden',
-          boxShadow: '0 4px 20px rgba(26,38,64,0.18)',
-          userSelect: 'none',
-        }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={slidePath(moduleN, current)}
-          alt={`Module ${moduleN}, slide ${current} of ${slideCount}`}
-          style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
-          draggable={false}
-        />
-
-        {/* Left tap zone (previous) */}
-        <button
-          aria-label="Previous slide"
-          onClick={goPrev}
-          disabled={atStart}
-          style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            height: '100%',
-            width: '15%',
-            border: 'none',
-            background: 'transparent',
-            cursor: atStart ? 'default' : 'pointer',
-          }}
-        />
-        {/* Right tap zone (next) */}
-        <button
-          aria-label="Next slide"
-          onClick={goNext}
-          disabled={atEnd}
-          style={{
-            position: 'absolute',
-            right: 0,
-            top: 0,
-            height: '100%',
-            width: '15%',
-            border: 'none',
-            background: 'transparent',
-            cursor: atEnd ? 'default' : 'pointer',
-          }}
-        />
-      </div>
-
-      {/* Progress bar */}
-      <div
-        style={{
-          height: '4px',
-          backgroundColor: 'var(--parchment)',
-          borderRadius: '999px',
-          marginTop: '0.9rem',
-          overflow: 'hidden',
-        }}
-      >
-        <div
-          style={{
-            height: '100%',
-            width: `${(current / slideCount) * 100}%`,
-            backgroundColor: 'var(--persimmon)',
-            transition: 'width 0.2s ease',
-          }}
-        />
-      </div>
-
-      {/* Controls */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginTop: '1rem',
-          gap: '1rem',
-        }}
-      >
-        <button
-          onClick={goPrev}
-          disabled={atStart}
-          style={{
-            fontFamily: "'Jost', sans-serif",
-            fontSize: '0.9rem',
-            fontWeight: 500,
-            padding: '0.65rem 1.4rem',
-            borderRadius: '8px',
-            border: '1px solid var(--navy)',
-            backgroundColor: atStart ? 'transparent' : '#fff',
-            color: atStart ? 'var(--light-text)' : 'var(--navy)',
-            opacity: atStart ? 0.4 : 1,
-            cursor: atStart ? 'default' : 'pointer',
-          }}
-        >
-          &larr; Previous
-        </button>
-
-        <span
-          style={{
-            fontFamily: "'Jost', sans-serif",
-            fontSize: '0.9rem',
-            color: 'var(--light-text)',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          Slide {current} of {slideCount}
-        </span>
-
-        <button
-          onClick={goNext}
-          disabled={atEnd}
-          style={{
-            fontFamily: "'Jost', sans-serif",
-            fontSize: '0.9rem',
-            fontWeight: 500,
-            padding: '0.65rem 1.4rem',
-            borderRadius: '8px',
-            border: '1px solid var(--persimmon)',
-            backgroundColor: atEnd ? 'transparent' : 'var(--persimmon)',
-            color: atEnd ? 'var(--light-text)' : '#fff',
-            opacity: atEnd ? 0.4 : 1,
-            cursor: atEnd ? 'default' : 'pointer',
-          }}
-        >
-          Next &rarr;
-        </button>
-      </div>
-
-      {/* Navigation help */}
-      <p
-        style={{
-          textAlign: 'center',
-          fontFamily: "'Jost', sans-serif",
-          fontSize: '0.78rem',
-          color: 'var(--light-text)',
-          marginTop: '0.75rem',
-        }}
-      >
-        Use the arrow keys, swipe, or tap the sides of the slide to navigate.
-      </p>
-
-      {/* End-of-module panel */}
-      {completed && (
-        <div
-          style={{
-            marginTop: '2rem',
-            backgroundColor: 'var(--parchment)',
-            border: '1px solid rgba(92,61,30,0.15)',
-            borderRadius: '12px',
-            padding: '1.75rem',
-            textAlign: 'center',
-          }}
-        >
-          <p
-            className="font-display"
-            style={{ fontSize: '1.4rem', fontWeight: 600, color: 'var(--navy)', margin: '0 0 0.5rem' }}
+          Module {moduleN} complete
+        </p>
+        <p style={{ fontSize: '0.95rem', color: 'var(--brown)', margin: '0 0 1.6rem' }}>
+          {isLastModule
+            ? 'You\u2019ve finished all six modules. You\u2019re ready to take the final assessment.'
+            : 'Nicely done. Continue to the next module when you\u2019re ready.'}
+        </p>
+        <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Link
+            href={`/courses/${COURSE.slug}`}
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: '0.9rem',
+              fontWeight: 500,
+              padding: '0.7rem 1.5rem',
+              borderRadius: '8px',
+              border: '1px solid var(--navy)',
+              backgroundColor: '#fff',
+              color: 'var(--navy)',
+              textDecoration: 'none',
+            }}
           >
-            Module {moduleN} complete
-          </p>
-          <p style={{ fontSize: '0.95rem', color: 'var(--brown)', margin: '0 0 1.4rem' }}>
-            {isLastModule
-              ? 'You\u2019ve finished all six modules. You\u2019re ready to take the final assessment.'
-              : 'Nicely done. Continue to the next module when you\u2019re ready.'}
-          </p>
-          <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+            Back to All Modules
+          </Link>
+          {isLastModule ? (
             <Link
-              href={`/courses/${COURSE.slug}`}
+              href={`/courses/${COURSE.slug}/quiz`}
               style={{
                 fontFamily: "'Jost', sans-serif",
                 fontSize: '0.9rem',
                 fontWeight: 500,
                 padding: '0.7rem 1.5rem',
                 borderRadius: '8px',
-                border: '1px solid var(--navy)',
-                backgroundColor: '#fff',
-                color: 'var(--navy)',
+                border: '1px solid var(--persimmon)',
+                backgroundColor: 'var(--persimmon)',
+                color: '#fff',
                 textDecoration: 'none',
               }}
             >
-              Back to All Modules
+              Take the Final Assessment &rarr;
             </Link>
-            {isLastModule ? (
+          ) : (
+            nextModule && (
               <Link
-                href={`/courses/${COURSE.slug}/quiz`}
+                href={`/courses/${COURSE.slug}/module/${nextModule.n}`}
                 style={{
                   fontFamily: "'Jost', sans-serif",
                   fontSize: '0.9rem',
@@ -344,31 +376,12 @@ export default function SlideViewer({ module }: Props) {
                   textDecoration: 'none',
                 }}
               >
-                Take the Final Assessment &rarr;
+                Next: Module {nextModule.n} &rarr;
               </Link>
-            ) : (
-              nextModule && (
-                <Link
-                  href={`/courses/${COURSE.slug}/module/${nextModule.n}`}
-                  style={{
-                    fontFamily: "'Jost', sans-serif",
-                    fontSize: '0.9rem',
-                    fontWeight: 500,
-                    padding: '0.7rem 1.5rem',
-                    borderRadius: '8px',
-                    border: '1px solid var(--persimmon)',
-                    backgroundColor: 'var(--persimmon)',
-                    color: '#fff',
-                    textDecoration: 'none',
-                  }}
-                >
-                  Next: Module {nextModule.n} &rarr;
-                </Link>
-              )
-            )}
-          </div>
+            )
+          )}
         </div>
-      )}
+      </div>
     </div>
   )
 }
