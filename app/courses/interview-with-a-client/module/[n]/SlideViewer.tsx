@@ -101,13 +101,9 @@ export default function SlideViewer({ module }: Props) {
 
   // ── Our own zoom (doesn't depend on the phone's native pinch-zoom, which
   //    behaves inconsistently over a fixed-position full-screen element).
-  //    Cycles: fit → 1.5x → 2x → fit. ──
-  const ZOOM_STEPS = [1, 1.5, 2]
-  const cycleZoom = () =>
-    setZoomLevel((z) => {
-      const idx = ZOOM_STEPS.indexOf(z)
-      return ZOOM_STEPS[(idx + 1) % ZOOM_STEPS.length]
-    })
+  //    Simple toggle: fit ↔ 1.5x, for inspecting a detail up close. ──
+  const ZOOM_LEVEL = 1.5
+  const cycleZoom = () => setZoomLevel((z) => (z > 1 ? 1 : ZOOM_LEVEL))
   const isZoomed = zoomLevel > 1
 
   const nextModule = MODULES.find((m) => m.n === moduleN + 1)
@@ -135,28 +131,24 @@ export default function SlideViewer({ module }: Props) {
           }
           .nhi-viewer-header {
             flex: 0 0 auto;
-            padding: 0.6rem 0.9rem 0.4rem;
+            padding: 0.4rem 0.7rem;
           }
           .nhi-viewer-header-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 0.5rem;
-          }
-          .nhi-viewer-title-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            gap: 0.5rem;
-            margin-top: 0.15rem;
+            gap: 0.6rem;
           }
           .nhi-viewer-title {
             font-family: 'Jost', sans-serif;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             color: var(--parchment);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            flex: 1 1 auto;
+            text-align: center;
+            min-width: 0;
           }
           .nhi-viewer-exit {
             font-family: 'Jost', sans-serif;
@@ -200,6 +192,7 @@ export default function SlideViewer({ module }: Props) {
             align-items: center;
             justify-content: center;
             background-color: var(--navy);
+            overflow: hidden;
           }
           .nhi-viewer-stage img {
             max-width: 100%;
@@ -243,9 +236,10 @@ export default function SlideViewer({ module }: Props) {
           .nhi-viewer-hint {
             text-align: center;
             font-family: 'Jost', sans-serif;
-            font-size: 0.68rem;
-            color: rgba(245,237,216,0.55);
-            padding: 0.3rem 0 0.5rem;
+            font-size: 0.66rem;
+            color: rgba(245,237,216,0.5);
+            padding: 0.25rem 0.5rem 0.35rem;
+            flex: 0 0 auto;
           }
 
           /* ── Zoomed state: image renders larger, drag to pan ── */
@@ -263,30 +257,29 @@ export default function SlideViewer({ module }: Props) {
 
           /* ── Short screens (phone landscape): shrink chrome, maximize the slide ── */
           @media (max-height: 500px) {
-            .nhi-viewer-header { padding: 0.3rem 0.6rem 0.2rem; }
-            .nhi-viewer-title-row { display: none; }
+            .nhi-viewer-header { padding: 0.25rem 0.6rem; }
+            .nhi-viewer-title { display: none; }
             .nhi-viewer-hint { display: none; }
-            .nhi-viewer-nav-btn { padding: 0.55rem 0.5rem; font-size: 0.85rem; }
+            .nhi-viewer-nav-btn { padding: 0.5rem 0.5rem; font-size: 0.85rem; }
           }
         `}</style>
 
         <div className="nhi-viewer-header">
           <div className="nhi-viewer-header-row">
             <Link href={`/courses/${COURSE.slug}`} className="nhi-viewer-exit">
-              &larr; Exit to Modules
+              &larr; Exit
             </Link>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <span className="nhi-viewer-title">{title}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <span className="nhi-viewer-badge">
-                Module {moduleN} of {TOTAL_MODULES}
+                {current} / {slideCount}
               </span>
               <button
                 onClick={cycleZoom}
                 className="nhi-viewer-fs-btn"
-                aria-label="Change zoom level"
+                aria-label="Toggle zoom"
               >
-                {zoomLevel === 1 && '\uD83D\uDD0D Zoom In'}
-                {zoomLevel === 1.5 && '\uD83D\uDD0D Zoom More'}
-                {zoomLevel === 2 && '\uD83D\uDD0D Reset View'}
+                {isZoomed ? '\uD83D\uDD0D Reset' : '\uD83D\uDD0D Zoom'}
               </button>
               {fsSupported && (
                 <button
@@ -294,16 +287,10 @@ export default function SlideViewer({ module }: Props) {
                   className="nhi-viewer-fs-btn"
                   aria-label="Toggle fullscreen"
                 >
-                  Fullscreen
+                  &#x26F6;
                 </button>
               )}
             </div>
-          </div>
-          <div className="nhi-viewer-title-row">
-            <span className="nhi-viewer-title">{title}</span>
-            <span className="nhi-viewer-badge">
-              Slide {current} / {slideCount}
-            </span>
           </div>
         </div>
 
@@ -357,10 +344,10 @@ export default function SlideViewer({ module }: Props) {
         </div>
         <p className="nhi-viewer-hint">
           {isZoomed
-            ? 'Drag to pan the enlarged slide. Tap the zoom button again to zoom further or reset.'
+            ? 'Drag to pan. Tap "Reset" or double-tap the slide to zoom back out.'
             : atEnd
-            ? 'You\u2019ve reached the last slide. Tap \u201CFinish Module\u201D when you\u2019re ready to continue.'
-            : 'Use arrow keys, swipe, or tap the buttons above to navigate. Tap "Zoom In" or double-tap the slide to enlarge it.'}
+            ? 'You\u2019ve reached the last slide. Tap \u201CFinish Module\u201D to continue.'
+            : 'Arrow keys, swipe, or tap the sides to navigate \u00B7 double-tap to zoom.'}
         </p>
       </div>
     )
