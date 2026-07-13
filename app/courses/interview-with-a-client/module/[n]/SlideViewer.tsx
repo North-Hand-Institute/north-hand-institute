@@ -20,7 +20,7 @@ export default function SlideViewer({ module }: Props) {
   const [current, setCurrent] = useState(1) // 1-indexed slide number
   const [completed, setCompleted] = useState(false)
   const [fsSupported, setFsSupported] = useState(false)
-  const [zoomed, setZoomed] = useState(false)
+  const [zoomLevel, setZoomLevel] = useState(1) // 1 = fit, then 1.5x, 2x, back to 1
   const touchStartX = useRef<number | null>(null)
   const touchStartY = useRef<number | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -65,11 +65,11 @@ export default function SlideViewer({ module }: Props) {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') goNext()
       else if (e.key === 'ArrowLeft') goPrev()
-      else if (e.key === 'Escape' && zoomed) setZoomed(false)
+      else if (e.key === 'Escape' && zoomLevel > 1) setZoomLevel(1)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [goNext, goPrev, zoomed])
+  }, [goNext, goPrev, zoomLevel])
 
   // ── Touch / swipe navigation ──
   const onTouchStart = (e: React.TouchEvent) => {
@@ -100,8 +100,15 @@ export default function SlideViewer({ module }: Props) {
   }
 
   // ── Our own zoom (doesn't depend on the phone's native pinch-zoom, which
-  //    behaves inconsistently over a fixed-position full-screen element) ──
-  const toggleZoom = () => setZoomed((z) => !z)
+  //    behaves inconsistently over a fixed-position full-screen element).
+  //    Cycles: fit → 1.5x → 2x → fit. ──
+  const ZOOM_STEPS = [1, 1.5, 2]
+  const cycleZoom = () =>
+    setZoomLevel((z) => {
+      const idx = ZOOM_STEPS.indexOf(z)
+      return ZOOM_STEPS[(idx + 1) % ZOOM_STEPS.length]
+    })
+  const isZoomed = zoomLevel > 1
 
   const nextModule = MODULES.find((m) => m.n === moduleN + 1)
   const isLastModule = moduleN === TOTAL_MODULES
@@ -251,7 +258,6 @@ export default function SlideViewer({ module }: Props) {
           .nhi-viewer-stage img.nhi-viewer-img-zoomed {
             max-width: none !important;
             max-height: none !important;
-            width: 200% !important;
             height: auto !important;
           }
 
@@ -274,11 +280,13 @@ export default function SlideViewer({ module }: Props) {
                 Module {moduleN} of {TOTAL_MODULES}
               </span>
               <button
-                onClick={toggleZoom}
+                onClick={cycleZoom}
                 className="nhi-viewer-fs-btn"
-                aria-label="Toggle zoom"
+                aria-label="Change zoom level"
               >
-                {zoomed ? '\uD83D\uDD0D Reset View' : '\uD83D\uDD0D Zoom In'}
+                {zoomLevel === 1 && '\uD83D\uDD0D Zoom In'}
+                {zoomLevel === 1.5 && '\uD83D\uDD0D Zoom More'}
+                {zoomLevel === 2 && '\uD83D\uDD0D Reset View'}
               </button>
               {fsSupported && (
                 <button
@@ -307,19 +315,20 @@ export default function SlideViewer({ module }: Props) {
         </div>
 
         <div
-          className={zoomed ? 'nhi-viewer-stage nhi-viewer-stage-zoomed' : 'nhi-viewer-stage'}
-          onTouchStart={zoomed ? undefined : onTouchStart}
-          onTouchEnd={zoomed ? undefined : onTouchEnd}
+          className={isZoomed ? 'nhi-viewer-stage nhi-viewer-stage-zoomed' : 'nhi-viewer-stage'}
+          onTouchStart={isZoomed ? undefined : onTouchStart}
+          onTouchEnd={isZoomed ? undefined : onTouchEnd}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={slidePath(moduleN, current)}
             alt={`Module ${moduleN}, slide ${current} of ${slideCount}`}
             draggable={false}
-            onDoubleClick={toggleZoom}
-            className={zoomed ? 'nhi-viewer-img-zoomed' : undefined}
+            onDoubleClick={cycleZoom}
+            className={isZoomed ? 'nhi-viewer-img-zoomed' : undefined}
+            style={isZoomed ? { width: `${zoomLevel * 100}%` } : undefined}
           />
-          {!zoomed && (
+          {!isZoomed && (
             <>
               <button
                 aria-label="Previous slide"
@@ -347,8 +356,8 @@ export default function SlideViewer({ module }: Props) {
           </button>
         </div>
         <p className="nhi-viewer-hint">
-          {zoomed
-            ? 'Drag to pan the enlarged slide. Tap "Reset View" or double-tap the image to zoom back out.'
+          {isZoomed
+            ? 'Drag to pan the enlarged slide. Tap the zoom button again to zoom further or reset.'
             : atEnd
             ? 'You\u2019ve reached the last slide. Tap \u201CFinish Module\u201D when you\u2019re ready to continue.'
             : 'Use arrow keys, swipe, or tap the buttons above to navigate. Tap "Zoom In" or double-tap the slide to enlarge it.'}
