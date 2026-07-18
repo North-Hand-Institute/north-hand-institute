@@ -36,7 +36,7 @@ export default function About({ bioMain, bioSecondary, quote }: { bioMain?: stri
           <div style={{ position: 'relative', padding: '3rem', background: '#1a2640' }}>
             <div style={{ position: 'absolute', top: '-0.5rem', left: '2rem', fontFamily: 'Cormorant Garamond, serif', fontSize: '8rem', color: '#c9572a', opacity: 0.25, lineHeight: 1 }}>"</div>
             <blockquote style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(1.1rem, 2vw, 1.5rem)', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.6, color: '#f5edd8' }}>
-              {quote || 'The body speaks in patterns. Learning to listen — through meridian, muscle, and fascia — transforms what we can offer our clients.'}
+              {quote || 'The body speaks in patterns. Learning to listen — through meridian, muscle, fascia, and bone — transforms what we can offer our clients.'}
             </blockquote>
             <cite style={{ display: 'block', marginTop: '1.5rem', fontSize: '0.68rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#b8956a', fontStyle: 'normal', fontFamily: 'Jost, sans-serif' }}>
               — Michael Corcoran, LMT · Founder, North Hand Institute
